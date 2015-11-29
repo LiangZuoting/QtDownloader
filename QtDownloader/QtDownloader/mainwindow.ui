@@ -13,19 +13,99 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>100</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string>PushButton</string>
+   <property name="margin">
+    <number>0</number>
    </property>
-  </widget>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="minimize">
+       <property name="text">
+        <string>min</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="maximize">
+       <property name="text">
+        <string>max</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="close">
+       <property name="text">
+        <string>close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QToolButton" name="start">
+       <property name="text">
+        <string>开始</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="pause">
+       <property name="text">
+        <string>暂停</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="erase">
+       <property name="text">
+        <string>删除</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QListView" name="taskList"/>
+   </item>
+  </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
@@ -33,14 +113,46 @@
  </resources>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>maximize</sender>
    <signal>clicked()</signal>
    <receiver>MainWindowClass</receiver>
-   <slot>onClick()</slot>
+   <slot>onMaximize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>217</x>
-     <y>111</y>
+     <x>531</x>
+     <y>10</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>minimize</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowClass</receiver>
+   <slot>onMinimize()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>494</x>
+     <y>10</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>299</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>close</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindowClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>574</x>
+     <y>10</y>
     </hint>
     <hint type="destinationlabel">
      <x>299</x>
@@ -50,6 +162,8 @@
   </connection>
  </connections>
  <slots>
-  <slot>onClick()</slot>
+  <slot>onMinimize()</slot>
+  <slot>onMaximize()</slot>
+  <slot>onClose()</slot>
  </slots>
 </ui>

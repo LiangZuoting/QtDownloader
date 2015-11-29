@@ -14,13 +14,12 @@ public:
 
 protected:
 	virtual bool winEvent( MSG *message, long *result);
-// 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
-// 	virtual void mouseMoveEvent(QMouseEvent *event);
-// 	virtual void mousePressEvent(QMouseEvent *event);
-// 	virtual void mouseReleaseEvent(QMouseEvent *event);
+	virtual void showEvent(QShowEvent *e);
+	virtual void keyPressEvent(QKeyEvent *e);
 
 private slots:
-	void onClick();
+	void onMinimize();
+	void onMaximize();
 
 private:
 	long hitTest(const QPoint &pos);
