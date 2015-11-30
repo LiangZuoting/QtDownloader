@@ -3,6 +3,7 @@
 #include <QNetworkReply>
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 
 const QString DownloadTask::INFO_FILE_EXT("inf");
 const QString DownloadTask::TASK_FILE_EXT("tsk");
@@ -29,28 +30,8 @@ void DownloadTask::start()
 	{
 		splitName();
 	}
-	QString infoFile = infoFileFullName();
-	QFile fileInfo(infoFile);
-	if (fileInfo.open(QFile::ReadOnly)
-		&& fileInfo.read((char*)&size_, sizeof(size_)) == sizeof(size_)
-		&& fileInfo.read((char*)&progress_, sizeof(progress_) == sizeof(progress_)))
-	{
-		fileInfo.close();
-	} 
-	else
-	{
-		if (fileInfo.isOpen())
-		{
-			fileInfo.close();
-		}
-		fileInfo.open(QFile::ReadWrite | QFile::Truncate);
-		fileInfo.close();
-	}
-	QNetworkRequest req(url_);
-	QString range("bytes=%1-");
-	range = range.arg(progress_);
-	req.setRawHeader("Range", range.toUtf8());
-	QNetworkReply *reply = networkMgr_->get(req);
+	
+	QNetworkReply *reply = networkMgr_->get(QNetworkRequest(url_));
 	connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64)));
 	connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
 }
@@ -58,6 +39,74 @@ void DownloadTask::start()
 void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
 	QNetworkReply *reply = reinterpret_cast<QNetworkReply*>(sender());
+	reply->deleteLater();
+	if (reply->error() != QNetworkReply::NoError)
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << reply->error();
+		return;
+	}
+	QFileInfo fi(infoFileFullName());
+	qint64 bytesWritten = 0;
+	if (!fi.exists())
+	{
+		size_ = reply->header(QNetworkRequest::ContentLengthHeader).toLongLong();
+		QFile taskFile(taskFileFullName());
+		if (!taskFile.open(QFile::ReadWrite))
+		{
+			qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << taskFile.error();
+			return;
+		}
+		if (!taskFile.resize(size_))
+		{
+			qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << taskFile.error();
+			return;
+		}
+		QFile infoFile(infoFileFullName());
+		if (!infoFile.open(QFile::ReadWrite))
+		{
+			qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << infoFile.error();
+			return;
+		}
+		bytesWritten = infoFile.write((char*)&size_, sizeof(size_));
+		if (bytesWritten != sizeof(size_))
+		{
+			qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << infoFile.error();
+			return;
+		}
+	}
+	QFile taskFile(taskFileFullName());
+	if (!taskFile.open(QFile::ReadWrite))
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << taskFile.error();
+		return;
+	}
+	qint64 size = reply->size();
+	bytesWritten = taskFile.write(reply->readAll());
+	if (bytesWritten != size)
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << taskFile.error();
+		return;
+	}
+	progress_ += size;
+
+	QFile infoFile(infoFileFullName());
+	if (!infoFile.open(QFile::ReadWrite))
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << infoFile.error();
+		return;
+	}
+	if (!infoFile.seek(sizeof(size_)))
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << infoFile.error();
+		return;
+	}
+	bytesWritten = infoFile.write((char*)&progress_, sizeof(progress_));
+	if (bytesWritten != sizeof(progress_))
+	{
+		qDebug() << __FUNCTIONW__ << " " << __LINE__ << " error : " << infoFile.error();
+		return;
+	}
+
 	auto data = reply->readAll();
 	//write files.
 }
@@ -90,6 +139,17 @@ QString DownloadTask::infoFileFullName()
 	{
 		result += "\\";
 	}
-	result += "." + INFO_FILE_EXT;
+	result += name_ + "." + INFO_FILE_EXT;
+	return result;
+}
+
+QString DownloadTask::taskFileFullName()
+{
+	QString result = path_;
+	if (!result.endsWith('\\'))
+	{
+		result += "\\";
+	}
+	result += name_ + "." + TASK_FILE_EXT;
 	return result;
 }
