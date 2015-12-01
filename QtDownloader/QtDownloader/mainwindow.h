@@ -3,6 +3,7 @@
 
 #include <QtGui/QDialog>
 #include "ui_mainwindow.h"
+#include <QNetworkAccessManager>
 
 class MainWindow : public QDialog
 {
@@ -25,6 +26,7 @@ private:
 	long hitTest(const QPoint &pos);
 
 	Ui::MainWindowClass ui;
+	QNetworkAccessManager mgr_;
 };
 
 #endif // MAINWINDOW_H

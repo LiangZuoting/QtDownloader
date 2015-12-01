@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 class DownloadTask : public QObject
 {
@@ -45,6 +46,7 @@ public:
 private slots:
 	void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void onFinished();
+	void onError(QNetworkReply::NetworkError code);
 
 private:
 	static const QString INFO_FILE_EXT;

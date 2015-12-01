@@ -2,6 +2,7 @@
 #include <qt_windows.h>
 #include <QMouseEvent>
 #include <QDesktopWidget>
+#include "downloadtask.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
@@ -12,9 +13,14 @@
 
 MainWindow::MainWindow(QWidget *parent)
 	: QDialog(parent, 0)
+	, mgr_(this)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::FramelessWindowHint);
+
+	DownloadTask *task = new DownloadTask(this, &mgr_);
+	task->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
+	task->start();
 }
 
 MainWindow::~MainWindow()
