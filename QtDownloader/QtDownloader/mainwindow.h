@@ -26,6 +26,8 @@ private slots:
 	void onStart();
 	void onPause();
 	void onErase();
+	void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal, qint64 bytesPerSecond);
+	void onFinished();
 
 private:
 	long hitTest(const QPoint &pos);
