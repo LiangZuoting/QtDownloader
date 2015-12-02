@@ -2,7 +2,9 @@
 #include <qt_windows.h>
 #include <QMouseEvent>
 #include <QDesktopWidget>
+#include <QStandardItemModel>
 #include "downloadtask.h"
+#include "taskitem.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
@@ -18,6 +20,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::FramelessWindowHint);
+
+	ui.taskList->setItemDelegate(new TaskItem(this));
+	auto oldModel = ui.taskList->model();
+	auto model = new QStandardItemModel(this);
+	ui.taskList->setModel(model);
+	model->setColumnCount(1);
+	if (oldModel)
+	{
+		delete oldModel;
+	}
 }
 
 MainWindow::~MainWindow()
@@ -117,6 +129,10 @@ void MainWindow::onStart()
 	{
 		task_ = new DownloadTask(this, &mgr_);
 		task_->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
+		QStandardItemModel *model = static_cast<QStandardItemModel*>(ui.taskList->model());
+		model->setRowCount(model->rowCount()+1);
+		auto modelIndex = model->index(model->rowCount()-1, 0);
+		model->setData(modelIndex, (int)new TaskItemData(this), Qt::DisplayRole);
 	}
 	task_->start();
 }
