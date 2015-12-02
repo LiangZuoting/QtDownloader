@@ -5,6 +5,8 @@
 #include "ui_mainwindow.h"
 #include <QNetworkAccessManager>
 
+class DownloadTask;
+
 class MainWindow : public QDialog
 {
 	Q_OBJECT
@@ -21,12 +23,16 @@ protected:
 private slots:
 	void onMinimize();
 	void onMaximize();
+	void onStart();
+	void onPause();
+	void onErase();
 
 private:
 	long hitTest(const QPoint &pos);
 
 	Ui::MainWindowClass ui;
 	QNetworkAccessManager mgr_;
+	DownloadTask *task_;
 };
 
 #endif // MAINWINDOW_H

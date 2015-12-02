@@ -138,6 +138,7 @@ void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 		qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile.error();
 		return;
 	}
+	emit downloadProgress(progress_, size_);
 	if (state_ == Pause || state_ == Cancel)
 	{
 		reply->deleteLater();
@@ -152,6 +153,7 @@ void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 void DownloadTask::onFinished()
 {
 	qDebug() << QString(__FUNCTION__);
+	emit finished();
 	QNetworkReply *reply = reinterpret_cast<QNetworkReply*>(sender());
 	if (reply->error() == QNetworkReply::NoError)
 	{
@@ -174,6 +176,7 @@ void DownloadTask::onFinished()
 
 void DownloadTask::onError(QNetworkReply::NetworkError code)
 {
+	emit error(code);
 	state_ = Error;
 	QNetworkReply *reply = reinterpret_cast<QNetworkReply*>(sender());
 	qDebug() << "error : " << reply->errorString();

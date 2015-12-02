@@ -43,6 +43,11 @@ public:
 	void setState(State state);
 	State state() const;
 
+signals:
+	void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
+	void finished();
+	void error(QNetworkReply::NetworkError code);
+
 private slots:
 	void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 	void onFinished();

@@ -14,13 +14,10 @@
 MainWindow::MainWindow(QWidget *parent)
 	: QDialog(parent, 0)
 	, mgr_(this)
+	, task_(NULL)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::FramelessWindowHint);
-
-	DownloadTask *task = new DownloadTask(this, &mgr_);
-	task->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
-	task->start();
 }
 
 MainWindow::~MainWindow()
@@ -58,15 +55,20 @@ bool MainWindow::winEvent(MSG *message, long *result)
 	}
 	else if (message->message == WM_NCCALCSIZE)
 	{
-		if (message->wParam && IsZoomed(message->hwnd))
+		*result = 0;
+		QRect rect;
+		if (message->wParam)
 		{
 			NCCALCSIZE_PARAMS *ncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(message->lParam);
-			QDesktopWidget desktopWidget;
-			auto rect = desktopWidget.availableGeometry(this);
-			ncsp->rgrc[0].left = rect.left();
-			ncsp->rgrc[0].top = rect.top();
-			ncsp->rgrc[0].right = rect.right();
-			ncsp->rgrc[0].bottom = rect.bottom();
+			if (IsZoomed(message->hwnd))
+			{
+				QDesktopWidget desktopWidget;
+				rect = desktopWidget.availableGeometry(this);
+				ncsp->rgrc[0].left = rect.left();
+				ncsp->rgrc[0].top = rect.top();
+				ncsp->rgrc[0].right = rect.right();
+				ncsp->rgrc[0].bottom = rect.bottom();
+			}
 		}
 		return true;
 	}
@@ -76,9 +78,11 @@ bool MainWindow::winEvent(MSG *message, long *result)
 void MainWindow::showEvent(QShowEvent *e)
 {
 	//DON'T set window style in constructor, cause when layout is applied, window style you set in constructor will be changed.
-	HWND hWnd = reinterpret_cast<HWND>(winId());
-	SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_CAPTION | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
-	__super::showEvent(e);
+	if (isVisible())
+	{
+		HWND hWnd = reinterpret_cast<HWND>(winId());
+		SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) | WS_CAPTION | WS_THICKFRAME | WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
+	}
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -105,6 +109,26 @@ void MainWindow::onMaximize()
 	{
 		PostMessage(hWnd, WM_SYSCOMMAND, HTCAPTION | SC_MAXIMIZE, 0);
 	}
+}
+
+void MainWindow::onStart()
+{
+	if (!task_)
+	{
+		task_ = new DownloadTask(this, &mgr_);
+		task_->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
+	}
+	task_->start();
+}
+
+void MainWindow::onPause()
+{
+	task_->pause();
+}
+
+void MainWindow::onErase()
+{
+	task_->cancel();
 }
 
 long MainWindow::hitTest(const QPoint &pos)
