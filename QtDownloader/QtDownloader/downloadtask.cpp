@@ -3,9 +3,34 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileInfo>
+#include <QDateTime>
 
 const QString DownloadTask::INFO_FILE_EXT("inf");
 const QString DownloadTask::TASK_FILE_EXT("tsk");
+
+DownloadTask::SpeedTest::SpeedTest()
+	: downloadBytes_(0)
+{}
+
+void DownloadTask::SpeedTest::reset()
+{
+	currentMSecsSinceEpoch_ = 0;
+	lastMSecsSinceEpoch_ = 0;
+	downloadBytes_ = 0;
+}
+
+qint64 DownloadTask::SpeedTest::bytesPerSecond(qint64 currentMSecsSinceEpoch)
+{
+	currentMSecsSinceEpoch_ = currentMSecsSinceEpoch;
+	qint64 result = 0;
+	if (downloadBytes_ > 0)
+	{
+		result = (float)downloadBytes_ / (currentMSecsSinceEpoch_ - lastMSecsSinceEpoch_) * 1000;
+	}
+	lastMSecsSinceEpoch_ = currentMSecsSinceEpoch;
+	downloadBytes_ = 0;
+	return result;
+}
 
 DownloadTask::DownloadTask(QObject *parent, QNetworkAccessManager *netMgr)
 	: QObject(parent)
@@ -40,6 +65,7 @@ void DownloadTask::start()
 	connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64)));
 	connect(reply, SIGNAL(finished()), this, SLOT(onFinished()));
 	connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(onError(QNetworkReply::NetworkError)));
+	speedTest_.lastMSecsSinceEpoch_ = QDateTime::currentMSecsSinceEpoch();
 }
 
 void DownloadTask::start(const QString &url)
@@ -51,6 +77,7 @@ void DownloadTask::start(const QString &url)
 void DownloadTask::pause()
 {
 	state_ = Pause;
+	speedTest_.reset();
 }
 
 void DownloadTask::cancel()
@@ -138,7 +165,16 @@ void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 		qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile.error();
 		return;
 	}
-	emit downloadProgress(progress_, size_);
+	speedTest_.downloadBytes_ += size;
+	qint64 currentMsecs = QDateTime::currentMSecsSinceEpoch();
+	qint64 timeSpan = currentMsecs - speedTest_.lastMSecsSinceEpoch_;
+	qint64 bytesPerSecond = 0;
+	if (timeSpan > 50)	//每50ms通知一次UI
+	{
+		bytesPerSecond = speedTest_.bytesPerSecond(currentMsecs);
+		emit downloadProgress(progress_, size_, bytesPerSecond);
+		qDebug() << "kbytes per second : " << bytesPerSecond / 1024.0f << " timespan : " << timeSpan;
+	}
 	if (state_ == Pause || state_ == Cancel)
 	{
 		reply->deleteLater();
