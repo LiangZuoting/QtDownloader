@@ -4,7 +4,6 @@
 #include <QDesktopWidget>
 #include <QStandardItemModel>
 #include "downloadtask.h"
-#include "taskitem.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
@@ -22,16 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::FramelessWindowHint);
-
-	ui.taskList->setItemDelegate(new TaskItem(this));
-	auto oldModel = ui.taskList->model();
-	auto model = new QStandardItemModel(this);
-	ui.taskList->setModel(model);
-	model->setColumnCount(1);
-	if (oldModel)
-	{
-		delete oldModel;
-	}
 }
 
 MainWindow::~MainWindow()
@@ -133,12 +122,6 @@ void MainWindow::onStart()
 		connect(task_, SIGNAL(downloadProgress(qint64, qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64, qint64)));
 		connect(task_, SIGNAL(finished()), this, SLOT(onFinished()));
 		task_->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
-		QStandardItemModel *model = static_cast<QStandardItemModel*>(ui.taskList->model());
-		model->setRowCount(model->rowCount()+1);
-		auto modelIndex = model->index(model->rowCount()-1, 0);
-		TaskItemData *data = new TaskItemData(this);
-		task_->setProperty(TASK_ITEM_DATA, (int)data);
-		model->setData(modelIndex, task_->property(TASK_ITEM_DATA), Qt::DisplayRole);
 	}
 	task_->start();
 }
@@ -156,11 +139,6 @@ void MainWindow::onErase()
 void MainWindow::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal, qint64 bytesPerSecond)
 {
 	DownloadTask *task = static_cast<DownloadTask*>(sender());
-	TaskItemData *data = reinterpret_cast<TaskItemData*>(task->property(TASK_ITEM_DATA).toInt());
-	data->bytesPerSecond = bytesPerSecond;
-	data->progress = bytesReceived;
-	data->size = bytesTotal;
-	ui.taskList->update();
 }
 
 void MainWindow::onFinished()
