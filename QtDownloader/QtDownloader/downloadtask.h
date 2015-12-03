@@ -36,10 +36,10 @@ public:
 	void setPath(const QString &path);
 	QString path() const;
 	QString fullName() const;
-	void setSize(quint64 size);
-	quint64 size() const;
-	void setProgress(quint64 progress);
-	quint64 progress() const;
+	void setSize(qint64 size);
+	qint64 size() const;
+	void setProgress(qint64 progress);
+	qint64 progress() const;
 	void setState(State state);
 	State state() const;
 

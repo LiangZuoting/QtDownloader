@@ -26,6 +26,8 @@ public:
 	const TaskItemData& itemData() const;
 
 private:
+	QString bytesToDisplayString(qint64 bytes);
+
 	Ui::TaskItemWidget ui;
 	TaskItemData data_;
 };

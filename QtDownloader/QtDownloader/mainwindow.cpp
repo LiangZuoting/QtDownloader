@@ -4,6 +4,7 @@
 #include <QDesktopWidget>
 #include <QStandardItemModel>
 #include "downloadtask.h"
+#include "taskitemwidget.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lp)                        ((int)(short)LOWORD(lp))
@@ -122,6 +123,9 @@ void MainWindow::onStart()
 		connect(task_, SIGNAL(downloadProgress(qint64, qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64, qint64)));
 		connect(task_, SIGNAL(finished()), this, SLOT(onFinished()));
 		task_->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
+		TaskItemData data;
+		data.task = task_;
+		ui.taskList->createCellWidget(ui.taskList->rowCount(), data);
 	}
 	task_->start();
 }
@@ -139,6 +143,10 @@ void MainWindow::onErase()
 void MainWindow::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal, qint64 bytesPerSecond)
 {
 	DownloadTask *task = static_cast<DownloadTask*>(sender());
+	TaskItemWidget *item = ui.taskList->findItemWidget(task);
+	auto data = item->itemData();
+	data.bytesPerSecond = bytesPerSecond;
+	item->updateData(data);
 }
 
 void MainWindow::onFinished()

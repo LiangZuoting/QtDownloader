@@ -90,6 +90,53 @@ void DownloadTask::setUrl(const QString &url)
 	url_ = url;
 }
 
+QString DownloadTask::url() const
+{
+	return url_;
+}
+
+void DownloadTask::setName(const QString &name)
+{
+	name_ = name;
+}
+
+QString DownloadTask::name() const
+{
+	return name_;
+}
+
+void DownloadTask::setPath(const QString &path)
+{
+	path_ = path;
+}
+
+QString DownloadTask::path() const
+{
+	return path_;
+}
+
+void DownloadTask::setSize(qint64 size)
+{
+	size_ = size;
+}
+
+qint64 DownloadTask::size() const
+{
+	return size_;
+}
+
+void DownloadTask::setProgress(qint64 progress)
+{
+	progress_ = progress;
+}
+
+qint64 DownloadTask::progress() const
+{
+	return progress_;
+}
+
+
+
 void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
 	qDebug() << QString(__FUNCTION__) << " bytesReceived:" << bytesReceived << " , bytesTotal:" << bytesTotal;
