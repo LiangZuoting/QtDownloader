@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtDownloader", "QtDownloader\QtDownloader.vcxproj", "{D401C210-623A-43EE-8099-8328307C1E3E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QDownloader", "QDownloader\QDownloader.vcxproj", "{19468851-5228-467D-B75A-4C61F422183D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{D401C210-623A-43EE-8099-8328307C1E3E}.Debug|Win32.Build.0 = Debug|Win32
 		{D401C210-623A-43EE-8099-8328307C1E3E}.Release|Win32.ActiveCfg = Release|Win32
 		{D401C210-623A-43EE-8099-8328307C1E3E}.Release|Win32.Build.0 = Release|Win32
+		{19468851-5228-467D-B75A-4C61F422183D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{19468851-5228-467D-B75A-4C61F422183D}.Debug|Win32.Build.0 = Debug|Win32
+		{19468851-5228-467D-B75A-4C61F422183D}.Release|Win32.ActiveCfg = Release|Win32
+		{19468851-5228-467D-B75A-4C61F422183D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

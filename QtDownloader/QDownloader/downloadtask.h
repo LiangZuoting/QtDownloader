@@ -1,11 +1,13 @@
 #ifndef DOWNLOADTASK_H
 #define DOWNLOADTASK_H
 
+#include "qdownloader_global.h"
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QFile>
 
-class DownloadTask : public QObject
+class QDOWNLOADER_EXPORT DownloadTask : public QObject
 {
 	Q_OBJECT
 
@@ -13,6 +15,7 @@ public:
 	enum State
 	{
 		Unvalid,
+		Init,
 		Start,
 		Pause,
 		Finish,
@@ -21,11 +24,11 @@ public:
 		Error,
 	};
 
-	DownloadTask(QObject *parent, QNetworkAccessManager *netMgr);
+	DownloadTask(QObject *parent);
 	~DownloadTask();
 
+	void init(const QString &savePath, const QString &url, QNetworkAccessManager *netMgr);
 	void start();
-	void start(const QString &url);
 	void pause();
 	void cancel();
 
@@ -44,6 +47,7 @@ public:
 	State state() const;
 
 signals:
+	void inited();
 	void downloadProgress(qint64 bytesReceived, qint64 bytesTotal, qint64 bytesPerSecond);
 	void finished();
 	void error(QNetworkReply::NetworkError code);
@@ -82,6 +86,8 @@ private:
 	State state_;
 	QNetworkAccessManager *networkMgr_;
 	SpeedTest speedTest_;
+	QFile infoFile_;
+	QFile taskFile_;
 };
 
 #endif // DOWNLOADTASK_H

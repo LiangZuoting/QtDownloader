@@ -26,6 +26,7 @@ private slots:
 	void onStart();
 	void onPause();
 	void onErase();
+	void onInit();
 	void onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal, qint64 bytesPerSecond);
 	void onFinished();
 

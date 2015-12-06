@@ -115,17 +115,22 @@ void MainWindow::onMaximize()
 	}
 }
 
+void MainWindow::onInit()
+{
+	TaskItemData data;
+	data.task = task_;
+	ui.taskList->createCellWidget(ui.taskList->rowCount(), data);
+}
+
 void MainWindow::onStart()
 {
 	if (!task_)
 	{
-		task_ = new DownloadTask(this, &mgr_);
+		task_ = new DownloadTask(this);
+		connect(task_, SIGNAL(inited()), this, SLOT(onInit()));
 		connect(task_, SIGNAL(downloadProgress(qint64, qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64, qint64)));
 		connect(task_, SIGNAL(finished()), this, SLOT(onFinished()));
-		task_->setUrl("http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe");
-		TaskItemData data;
-		data.task = task_;
-		ui.taskList->createCellWidget(ui.taskList->rowCount(), data);
+		task_->init("", "http://ermaopcassist.qiniudn.com/ErmaoPcAssist2.0.0.2.exe", &mgr_);
 	}
 	task_->start();
 }
