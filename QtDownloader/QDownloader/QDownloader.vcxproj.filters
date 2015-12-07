@@ -44,6 +44,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_downloadtask.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="downloadpool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_downloadpool.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_downloadpool.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qdownloader_global.h">
@@ -52,6 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="downloadtask.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="downloadpool.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
