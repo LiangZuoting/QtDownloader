@@ -49,7 +49,6 @@ DownloadTask::~DownloadTask()
 void DownloadTask::init(const QString &savePath, const QString &url, QNetworkAccessManager *netMgr)
 {
 	Q_ASSERT(state_ == Unvalid);
-	state_ = Init;
 	path_ = savePath;
 	url_ = url;
 	networkMgr_ = netMgr;
@@ -65,6 +64,29 @@ void DownloadTask::init(const QString &savePath, const QString &url, QNetworkAcc
 		infoFile_.read((char*)&size_, sizeof(size_));
 		infoFile_.read((char*)&progress_, sizeof(progress_));
 	}
+	state_ = Init;
+	emit inited();
+}
+
+void DownloadTask::load(const QString &path, const QString &infFile, QNetworkAccessManager *netMgr)
+{
+	Q_ASSERT(state_ == Unvalid);
+	path_ = path;
+	name_ = infFile.left(infFile.lastIndexOf('.'));
+	networkMgr_ = netMgr;
+	infoFile_.setFileName(infFile);
+	if (!infoFile_.open(QFile::ReadWrite))
+	{
+		qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile_.error();
+		return;
+	}
+	if (infoFile_.size() != 0)
+	{
+		infoFile_.read((char*)&size_, sizeof(size_));
+		infoFile_.read((char*)&progress_, sizeof(progress_));
+		url_ = QString::fromUtf8(infoFile_.readAll());
+	}
+	state_ = Init;
 	emit inited();
 }
 
@@ -179,6 +201,19 @@ void DownloadTask::onDownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
 		}
 		bytesWritten = infoFile_.write((char*)&size_, sizeof(size_));
 		if (bytesWritten != sizeof(size_))
+		{
+			qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile_.error();
+			return;
+		}
+		bytesWritten = infoFile_.write((char*)&progress_, sizeof(progress_));
+		if (bytesWritten != sizeof(progress_))
+		{
+			qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile_.error();
+			return;
+		}
+		auto urlBytes = url_.toUtf8();
+		bytesWritten = infoFile_.write(urlBytes);
+		if (bytesWritten != urlBytes.size())
 		{
 			qDebug() << QString(__FUNCTION__) << " " << __LINE__ << " error : " << infoFile_.error();
 			return;

@@ -6,6 +6,7 @@
 #include "qdownloader_global.h"
 
 class DownloadTask;
+class QNetworkAccessManager;
 class QDOWNLOADER_EXPORT DownloadPool : public QObject
 {
 	Q_OBJECT
@@ -16,6 +17,11 @@ public:
 	void init();
 
 	static DownloadPool& instance();
+
+	void load(const QString &path, QNetworkAccessManager *netMgr);
+
+private slots:
+	void onFinished();
 
 private:
 	DownloadPool(QObject *parent);

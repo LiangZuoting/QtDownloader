@@ -28,6 +28,7 @@ public:
 	~DownloadTask();
 
 	void init(const QString &savePath, const QString &url, QNetworkAccessManager *netMgr);
+	void load(const QString &path, const QString &infFile, QNetworkAccessManager *netMgr);
 	void start();
 	void pause();
 	void cancel();
